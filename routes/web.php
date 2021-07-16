@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BankController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
@@ -43,9 +44,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('/banks', function() {
-        return Inertia::render('Bank/List');
-    })->name('bank.list');
+    Route::get('/banks', [BankController::class, 'index'])->name('bank.list');
 
     Route::get('/bank/accounts', function() {
         return Inertia::render('Bank/Accounts');

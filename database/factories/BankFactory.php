@@ -22,7 +22,8 @@ class BankFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->company(),
+            'active' => $this->faker->boolean()
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bank;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class BankController extends Controller
@@ -12,9 +13,25 @@ class BankController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $data = Bank::select('id', 'name', 'active');
+        if ($request->search) {
+            $data->where('name', 'like', "%$request->search%");
+        }
+
+        if ($request->sortBy) {
+            $data->orderBy($request->sortBy, $request->sortDesc ? 'DESC' : 'ASC');
+        }
+
+        return Inertia::render('Bank/List', [
+            'data' => $data->paginate(12),
+            'options' => [
+                'search' => $request->search ?? '',
+                'sortBy' => $request->sortBy ?? '',
+                'sortDesc' => $request->sortDesc ?? 0,
+            ]
+        ]);
     }
 
     /**

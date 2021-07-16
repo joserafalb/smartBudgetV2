@@ -100,7 +100,7 @@
 <script>
 export default {
     data: () => ({
-        drawer: true,
+        drawer: false,
         user: {
             initials: "JD",
             fullName: "John Doe",
