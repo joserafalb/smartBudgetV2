@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class BankController extends Controller
 {
+
+    const LIST_VIEW = 'Bank/List';
+    const EDIT_VIEW = 'Bank/Edit';
+
     /**
      * Display a listing of the resource.
      *
@@ -24,12 +28,15 @@ class BankController extends Controller
             $data->orderBy($request->sortBy, $request->sortDesc ? 'DESC' : 'ASC');
         }
 
-        return Inertia::render('Bank/List', [
-            'data' => $data->paginate(12),
+        $data = $data->paginate(12);
+
+        return Inertia::render(self::LIST_VIEW, [
+            'data' => $data,
             'options' => [
+                'page' => $data->currentPage(),
                 'search' => $request->search ?? '',
                 'sortBy' => $request->sortBy ?? '',
-                'sortDesc' => $request->sortDesc ?? 0,
+                'sortDesc' => $request->sortDesc,
             ]
         ]);
     }
@@ -41,7 +48,7 @@ class BankController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render(self::EDIT_VIEW, []);
     }
 
     /**
@@ -52,7 +59,16 @@ class BankController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:banks,name'
+        ]);
+
+        $newRow = Bank::create([
+            'active' => $request->active ?? false,
+            'name' => $request->name,
+        ]);
+
+        return response()->json($newRow->id);
     }
 
     /**
@@ -74,7 +90,9 @@ class BankController extends Controller
      */
     public function edit(Bank $bank)
     {
-        //
+        return Inertia::render(self::EDIT_VIEW, [
+            'item' => $bank
+        ]);
     }
 
     /**
@@ -86,7 +104,13 @@ class BankController extends Controller
      */
     public function update(Request $request, Bank $bank)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:banks,name,' . $bank->id . ',id'
+        ]);
+
+        $bank->name = $request->name;
+        $bank->active = $request->active ?? false;
+        $bank->save();
     }
 
     /**
@@ -97,6 +121,6 @@ class BankController extends Controller
      */
     public function destroy(Bank $bank)
     {
-        //
+        $bank->delete();
     }
 }

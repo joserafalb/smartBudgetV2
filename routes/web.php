@@ -1,8 +1,12 @@
 <?php
 
-use App\Http\Controllers\BankController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BankController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AccountTypeController;
+use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\CategoryTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +35,7 @@ Route::get('/register', function () {
     return Inertia::render('User/Register');
 });
 
-Route::get('/reset-password', function() {
+Route::get('/reset-password', function () {
     return Inertia::render('User/ResetPassword', [
         'email' => $_GET['email'] ?? '',
         'token' => $_GET['token'] ?? ''
@@ -44,9 +48,12 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('/banks', [BankController::class, 'index'])->name('bank.list');
-
-    Route::get('/bank/accounts', function() {
-        return Inertia::render('Bank/Accounts');
-    })->name('bank.accounts');
+    /**
+     * Resource routes
+     */
+    Route::resource('banks', BankController::class);
+    Route::resource('account-type', AccountTypeController::class);
+    Route::resource('bank-accounts', BankAccountController::class);
+    Route::resource('category-type', CategoryTypeController::class);
+    Route::resource('category', CategoryController::class);
 });

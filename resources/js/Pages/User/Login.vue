@@ -1,7 +1,7 @@
 <template>
     <web-layout title="Login" :errorMessage="form.errors.email">
         <v-card-text>
-            <v-form ref="form" v-model="valid" lazy-validation>
+            <v-form ref="form" v-model="valid" lazy-validation @keyup.native.enter="login">
                 <v-text-field
                     v-model="form.email"
                     :rules="emailRules"

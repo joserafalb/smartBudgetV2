@@ -2,6 +2,7 @@ require('./bootstrap');
 
 // Import modules...
 import Vue from 'vue';
+import Vuelidate from 'vuelidate'
 import { App as InertiaApp, plugin as InertiaPlugin } from '@inertiajs/inertia-vue';
 
 // Add vuetify to project
@@ -10,7 +11,8 @@ import 'vuetify/dist/vuetify.min.css';
 
 Vue.mixin({ methods: { route } });
 Vue.use(InertiaPlugin);
-Vue.use(Vuetify)
+Vue.use(Vuetify);
+Vue.use(Vuelidate);
 
 const app = document.getElementById('app');
 

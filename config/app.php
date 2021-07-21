@@ -165,6 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Boomingup\CodeHelper\CodeHelperServiceProvider::class,
 
         /*
          * Application Service Providers...

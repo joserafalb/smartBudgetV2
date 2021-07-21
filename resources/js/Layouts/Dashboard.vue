@@ -16,10 +16,12 @@
                         >
                     </v-list-item>
                     <v-list-item link>
-                        <v-list-item-title>Account Type</v-list-item-title>
+                        <v-list-item-title @click="$inertia.visit('/account-type')">
+                        Account Type</v-list-item-title>
                     </v-list-item>
                     <v-list-item link>
-                        <v-list-item-title>Bank Accounts</v-list-item-title>
+                        <v-list-item-title @click="$inertia.visit('/bank-accounts')">
+                        Bank Accounts</v-list-item-title>
                     </v-list-item>
                 </v-list-group>
                 <v-list-group :value="false" no-action>
@@ -29,7 +31,12 @@
                         </v-list-item-content>
                     </template>
                     <v-list-item link>
-                        <v-list-item-title>Categories</v-list-item-title>
+                        <v-list-item-title @click="$inertia.visit('/category-type')">
+                        Category Type</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item link>
+                        <v-list-item-title @click="$inertia.visit('/category')">
+                        Categories</v-list-item-title>
                     </v-list-item>
                     <v-list-item link>
                         <v-list-item-title
