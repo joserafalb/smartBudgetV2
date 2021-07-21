@@ -17,9 +17,10 @@ class BankAccountController extends Controller
      */
     public function index(Request $request)
     {
-        $data = BankAccount::with('bank:id,name')
-            ->with('accountType:id,name')
-            ->select('id', 'name', 'active', 'bank_id', 'account_type_id');
+        $data = BankAccount::join('banks AS b', 'b.id', 'bank_accounts.bank_id')
+            ->join('account_types AS at', 'at.id', 'bank_accounts.account_type_id')
+            ->select('bank_accounts.id', 'bank_accounts.name', 'bank_accounts.active',
+                'b.name AS bank', 'at.name AS account_type');
 
         if ($request->search) {
             $data->where('name', 'like', "%$request->search%");

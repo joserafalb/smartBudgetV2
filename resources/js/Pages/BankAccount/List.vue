@@ -21,8 +21,8 @@ export default {
         return {
             headers: [
                 { text: "Account", value: "name" },
-                { text: "Bank", value: "bank.name" },
-                { text: "Type", value: "account_type.name" },
+                { text: "Bank", value: "bank" },
+                { text: "Type", value: "account_type" },
                 { text: "Active", value: "active" },
                 { text: "Actions", value: "actions", sortable: false }
             ]
