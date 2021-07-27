@@ -1,66 +1,72 @@
 <template>
     <v-app>
-        <v-navigation-drawer app v-model="drawer">
+        <v-navigation-drawer app v-model="drawer" v-if="$vuetify.breakpoint.sm">
             <v-list>
-                <v-list-group :value="false" no-action>
-                    <template v-slot:activator>
-                        <v-list-item-content>
+                <div v-for="(menu, index) in menuItems" :key="index">
+                    <v-list-group v-if="menu.items" :value="false" no-action>
+                        <template v-slot:activator>
+                            <v-list-item-content>
+                                <v-list-item-title>{{
+                                    menu.title
+                                }}</v-list-item-title>
+                            </v-list-item-content>
+                        </template>
+                        <v-list-item
+                            v-for="(subMenu, indexSubMenu) in menu.items"
+                            :key="indexSubMenu"
+                            link
+                        >
                             <v-list-item-title
-                                >Manage Accounts</v-list-item-title
+                                @click="$inertia.visit(subMenu.inertia)"
+                                >{{ subMenu.title }}</v-list-item-title
                             >
-                        </v-list-item-content>
-                    </template>
-                    <v-list-item link>
-                        <v-list-item-title @click="$inertia.visit('/banks')"
-                            >Banks</v-list-item-title
-                        >
+                        </v-list-item>
+                    </v-list-group>
+                    <v-list-item v-else link>
+                        <v-list-item-title @click="$inertia.visit(menu.inertia)"
+                            >{{ menu.title }}
+                        </v-list-item-title>
                     </v-list-item>
-                    <v-list-item link>
-                        <v-list-item-title @click="$inertia.visit('/account-type')">
-                        Account Type</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item link>
-                        <v-list-item-title @click="$inertia.visit('/bank-accounts')">
-                        Bank Accounts</v-list-item-title>
-                    </v-list-item>
-                </v-list-group>
-                <v-list-group :value="false" no-action>
-                    <template v-slot:activator>
-                        <v-list-item-content>
-                            <v-list-item-title>Transactions</v-list-item-title>
-                        </v-list-item-content>
-                    </template>
-                    <v-list-item link>
-                        <v-list-item-title @click="$inertia.visit('/category-type')">
-                        Category Type</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item link>
-                        <v-list-item-title @click="$inertia.visit('/category')">
-                        Categories</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item link>
-                        <v-list-item-title
-                            >Recurring Transactions</v-list-item-title
-                        >
-                    </v-list-item>
-                </v-list-group>
-                <v-list-item link>
-                    <v-list-item-title>Calendar</v-list-item-title>
-                </v-list-item>
+                </div>
             </v-list>
         </v-navigation-drawer>
 
         <v-app-bar app>
-            <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon
+                v-if="$vuetify.breakpoint.sm"
+                @click="drawer = !drawer"
+            ></v-app-bar-nav-icon>
             <v-toolbar-title>Smart Budget</v-toolbar-title>
+            <div v-for="(menu, index) in menuItems">
+                <v-menu open-on-hover offset-y :key="index" v-if="menu.items">
+                    <template v-slot:activator="{ on, attrs }">
+                        <span v-bind="attrs" v-on="on" class="menuItem">
+                            {{ menu.title }}
+                        </span>
+                    </template>
+                    <v-list>
+                        <v-list-item
+                            v-for="(subMenu, indexSubMenu) in menu.items"
+                            :key="indexSubMenu"
+                            link
+                        >
+                            <v-list-item-title
+                                @click="$inertia.visit(subMenu.inertia)"
+                                >{{ subMenu.title }}</v-list-item-title
+                            >
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <inertia-link v-else :href="menu.inertia" class="menuItem">
+                    {{ menu.title }}
+                </inertia-link>
+            </div>
             <v-spacer></v-spacer>
             <v-menu bottom min-width="200px" rounded offset-y>
                 <template v-slot:activator="{ on }">
                     <v-btn icon x-large v-on="on">
                         <v-avatar color="primary" size="36">
-                            <span class="white--text">{{
-                                user.initials
-                            }}</span>
+                            <span class="white--text">{{ user.initials }}</span>
                         </v-avatar>
                     </v-btn>
                 </template>
@@ -105,14 +111,42 @@
 </template>
 
 <script>
+import { Link } from "@inertiajs/inertia-vue";
+
 export default {
+    components: {
+        Link: Link
+    },
     data: () => ({
         drawer: false,
         user: {
             initials: "JD",
             fullName: "John Doe",
             email: "john.doe@doe.com"
-        }
+        },
+        menuItems: [
+            {
+                title: "Manage Accounts",
+                items: [
+                    { title: "Banks", inertia: "/banks" },
+                    { title: "Account Type", inertia: "/account-type" },
+                    { title: "Bank Accounts", inertia: "/bank-accounts" }
+                ]
+            },
+            {
+                title: "Transactions",
+                items: [
+                    { title: "Category Type", inertia: "/category-type" },
+                    { title: "Categories", inertia: "/category" },
+                    { title: "Goals", inertia: "/goal" },
+                    {
+                        title: "Recurring Transactions",
+                        inertia: "/recurring-transaction"
+                    }
+                ]
+            },
+            { title: "Calendar", inertia: "/calendar" }
+        ]
     }),
     methods: {
         logout() {
@@ -121,3 +155,9 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.menuItem {
+    text-decoration: none;
+}
+</style>

@@ -30,7 +30,8 @@ new Vue({
                     warning: '#FFC107',
                 }
             }
-        }
+        },
+        treeShake: true,
     }),
     render: (h) =>
         h(InertiaApp, {

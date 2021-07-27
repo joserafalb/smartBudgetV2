@@ -149,6 +149,6 @@ class BankAccountController extends Controller
      */
     public function destroy(BankAccount $bankAccount)
     {
-        //
+        $bankAccount->delete();
     }
 }
