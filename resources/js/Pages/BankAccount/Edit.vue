@@ -35,6 +35,38 @@
             @blur="$v.fields.accountTypeId.$touch()"
         ></v-autocomplete>
         <v-text-field
+            v-model="fields.initialBalance"
+            label="Initial Balance"
+            prefix="$"
+            required
+            :error-messages="initialBalanceErrors"
+            @input="$v.fields.initialBalance.$touch()"
+            @blur="$v.fields.initialBalance.$touch()"
+        />
+        <v-menu
+            v-model="datePicker"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+        >
+            <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                    v-model="fields.initialBalanceDate"
+                    label="Initial Balance Date"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                ></v-text-field>
+            </template>
+            <v-date-picker
+                v-model="fields.initialBalanceDate"
+                @input="datePicker = false"
+            ></v-date-picker>
+        </v-menu>
+        <v-text-field
             v-if="isCredit"
             v-model="fields.creditLimit"
             label="Credit limit"
@@ -47,7 +79,7 @@
 <script>
 import DashboardLayout from "@/Layouts/Dashboard";
 import { validationMixin } from "vuelidate";
-import { required, maxLength } from "vuelidate/lib/validators";
+import { required, maxLength, minValue, decimal } from "vuelidate/lib/validators";
 import EditPage from "../../Components/EditPage.vue";
 
 const routeName = "bank-accounts";
@@ -59,6 +91,7 @@ export default {
     },
     data() {
         return {
+            datePicker: false,
             isValid: false,
             isSaving: false,
             fields: {
@@ -67,6 +100,8 @@ export default {
                 bankId: this.$page.props.item?.bank_id,
                 accountTypeId: this.$page.props.item?.account_type_id,
                 creditLimit: this.$page.props.item?.credit_limit,
+                initialBalance: this.$page.props.item?.initial_balance,
+                initialBalanceDate: this.$page.props.item?.balance_date,
                 active: this.$page.props.item?.active
             },
             errorMessage: {},
@@ -108,6 +143,14 @@ export default {
             if (!this.$v.fields.accountTypeId.$dirty) return errors;
             !this.$v.fields.accountTypeId.required &&
                 errors.push("Account Type is required.");
+            return errors;
+        },
+        initialBalanceErrors() {
+            const errors = [];
+            if (!this.$v.fields.initialBalance.$dirty) return errors;
+            !this.$v.fields.initialBalance.required && errors.push("Name is required.");
+            !this.$v.fields.initialBalance.minValue && errors.push("Must be grather than 1.");
+            !this.$v.fields.initialBalance.decimal && errors.push("Must be a valid initial balance");
             return errors;
         },
         disableSave() {
@@ -158,7 +201,8 @@ export default {
         fields: {
             name: { required, maxLength: maxLength(250) },
             bankId: { required },
-            accountTypeId: { required }
+            accountTypeId: { required },
+            initialBalance: {required, minValue: minValue(1), decimal}
         }
     }
 };

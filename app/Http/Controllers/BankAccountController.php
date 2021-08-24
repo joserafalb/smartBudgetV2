@@ -81,6 +81,9 @@ class BankAccountController extends Controller
 
         if (AccountType::find($request->item['accountTypeId'])->isCredit) {
             $data['credit_limit'] = $request->item['creditLimit'];
+        } else {
+            $data['initial_balance'] = $request->item['initialBalance'];
+            $data['balance_date'] = $request->item['initialBalanceDate'];
         }
 
         $newRow = BankAccount::create($data);
@@ -137,7 +140,11 @@ class BankAccountController extends Controller
 
         if (AccountType::find($request->item['accountTypeId'])->isCredit) {
             $bankAccount->credit_limit = $request->item['creditLimit'];
+        } else {
+            $bankAccount->initial_balance = $request->item['initialBalance'];
+            $bankAccount->balance_date = $request->item['initialBalanceDate'];
         }
+
         $bankAccount->save();
     }
 

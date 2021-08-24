@@ -40,7 +40,7 @@
                     <template v-slot:day-label="{ day, month, date, present }">
                         <span
                             :class="{ today: present }"
-                            @click="showDay(date)"
+                            @click="showDay($event, date)"
                         >
                             {{ day }}
                         </span>
@@ -60,8 +60,9 @@
                 <v-menu
                     v-model="selectedOpen"
                     :close-on-content-click="false"
+                    :close-on-click="false"
                     :activator="selectedElement"
-                    absolute
+                    class="dialog"
                 >
                     <v-card color="grey lighten-4" min-width="350px" flat>
                         <v-toolbar :color="selectedEvent.color" dark>
@@ -69,8 +70,8 @@
                                 v-html="selectedDay.date"
                             ></v-toolbar-title>
                             <v-spacer></v-spacer>
-                            <v-btn icon>
-                                <v-icon>mdi-dots-vertical</v-icon>
+                            <v-btn icon class="addButton" @click="add">
+                                <v-icon>mdi-plus</v-icon>
                             </v-btn>
                         </v-toolbar>
                         <v-card-text>
@@ -83,6 +84,7 @@
                                 index) in selectedDay.transactions"
                                 :key="index"
                                 class="tw-mt-2"
+                                @click="edit(transaction)"
                                 >{{ transaction.description }}
                                 <v-spacer />
                                 {{ transaction.amount }}
@@ -101,15 +103,24 @@
                 </v-menu>
             </v-sheet>
         </v-col>
+        <transaction-dialog
+            :dialog="dialog"
+            @cancel="dialog = false"
+            @save="save"
+        ></transaction-dialog>
     </v-row>
 </template>
 
 <script>
 import DashboardLayout from "@/Layouts/Dashboard";
+import TransactionDialog from "@/Components/Transaction";
 import moment from "moment";
 
 export default {
     layout: DashboardLayout,
+    components: {
+        TransactionDialog
+    },
     props: {
         events: { type: Array, required: true },
         days: { type: Object, required: true },
@@ -125,7 +136,9 @@ export default {
             selectedDay: {},
             loadData: false,
             title: "",
-            isLoading: false
+            isLoading: false,
+            dialog: false,
+
         };
     },
     mounted() {
@@ -167,7 +180,9 @@ export default {
                 this.loadData = false;
             }
         },
-        showDay(date) {
+        showDay(event, date) {
+            this.selectedElement = event.target;
+
             const dateObject = moment(date + "T00:00:00");
             const transactions = this.transactions.filter(
                 item => item.date === dateObject.format("YYYY-MM-DD")
@@ -197,6 +212,17 @@ export default {
         },
         getAvailable(month, day) {
             return this.days[month] ? this.days[month][day]?.available : "";
+        },
+        add() {
+            this.dialog = true;
+            console.log("add");
+        },
+        edit(item) {
+            console.log(item);
+        },
+        save() {
+            console.log('save');
+            this.dialog = false;
         }
     }
 };
@@ -213,5 +239,9 @@ export default {
 
 .available {
     @apply tw-text-green-500 tw-mb-2;
+}
+
+.addButton {
+    margin-right: 0.25rem !important;
 }
 </style>
