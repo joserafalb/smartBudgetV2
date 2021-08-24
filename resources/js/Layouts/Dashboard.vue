@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-navigation-drawer app v-model="drawer" v-if="$vuetify.breakpoint.sm">
+        <v-navigation-drawer app v-model="drawer" v-if="$vuetify.breakpoint.smAndDown">
             <v-list>
                 <div v-for="(menu, index) in menuItems" :key="index">
                     <v-list-group v-if="menu.items" :value="false" no-action>
@@ -33,11 +33,11 @@
 
         <v-app-bar app>
             <v-app-bar-nav-icon
-                v-if="$vuetify.breakpoint.sm"
+                v-if="$vuetify.breakpoint.smAndDown"
                 @click="drawer = !drawer"
             ></v-app-bar-nav-icon>
             <v-toolbar-title>Smart Budget</v-toolbar-title>
-            <div v-for="(menu, index) in menuItems">
+            <div v-for="(menu, index) in menuItems" v-if="$vuetify.breakpoint.mdAndUp">
                 <v-menu open-on-hover offset-y :key="index" v-if="menu.items">
                     <template v-slot:activator="{ on, attrs }">
                         <span v-bind="attrs" v-on="on" class="menuItem">
@@ -156,8 +156,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 .menuItem {
+    @apply tw-ml-4;
     text-decoration: none;
 }
 </style>

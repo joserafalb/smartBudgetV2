@@ -3,11 +3,12 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BankController;
+use App\Http\Controllers\GoalController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AccountTypeController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CategoryTypeController;
-use App\Http\Controllers\GoalController;
 use App\Http\Controllers\RecurringTransactionsController;
 
 /*
@@ -50,9 +51,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('/calendar', function () {
-        return Inertia::render('Calendar/Index');
-    })->name('calendar');
+    Route::get('calendar/{year}/{month}', [CalendarController::class, 'index'])->name('calendar.index');
 
     /**
      * Resource routes
@@ -64,4 +63,5 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('category', CategoryController::class);
     Route::resource('goal', GoalController::class);
     Route::resource('recurring-transaction', RecurringTransactionsController::class);
+
 });

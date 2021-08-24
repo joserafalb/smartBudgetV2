@@ -52,4 +52,14 @@ class BankAccount extends Model
     {
         return $this->hasMany(RecurringTransactions::class);
     }
+
+    /**
+     * Get all of the transactions for the BankAccount
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

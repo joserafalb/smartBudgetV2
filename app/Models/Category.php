@@ -32,4 +32,14 @@ class Category extends Model
     {
         return $this->hasMany(RecurringTransactions::class);
     }
+
+    /**
+     * Get all of the transactions for the Category
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }
