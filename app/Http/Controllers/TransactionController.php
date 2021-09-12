@@ -35,7 +35,26 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'description' => 'required',
+            'date' => 'required',
+            'categoryId' => 'required',
+            'amount' => 'required',
+            'bankAccountId' => 'required',
+            'status' => 'required',
+        ]);
+
+        $data = [
+            'description' => $request->description,
+            'date' => $request->date,
+            'category_id' => $request->categoryId,
+            'amount' => $request->amount,
+            'status' => $request->status,
+            'bank_account_id' => $request->bankAccountId,
+        ];
+
+        $newRow = Transaction::create($data);
+        return response()->json($newRow->id);
     }
 
     /**
@@ -69,17 +88,32 @@ class TransactionController extends Controller
      */
     public function update(Request $request, Transaction $transaction)
     {
-        //
+        $request->validate([
+            'description' => 'required',
+            'date' => 'required',
+            'categoryId' => 'required',
+            'amount' => 'required',
+            'bankAccountId' => 'required',
+            'status' => 'required',
+        ]);
+
+        $transaction->description = $request->description;
+        $transaction->date = $request->date;
+        $transaction->category_id = $request->categoryId;
+        $transaction->amount = $request->amount;
+        $transaction->status = $request->status;
+        $transaction->save();
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Transaction  $transaction
-     * @return \Illuminate\Http\Response
+     *
+     * @return void
      */
     public function destroy(Transaction $transaction)
     {
-        //
+        $transaction->delete();
     }
 }

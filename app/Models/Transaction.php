@@ -9,6 +9,8 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['description', 'date', 'category_id', 'amount', 'bank_account_id', 'status'];
+
     /**
      * Get the category that owns the Transaction
      *

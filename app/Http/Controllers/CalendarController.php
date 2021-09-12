@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Category;
 use App\Models\BankAccount;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Classes\BalanceHelper;
+use Illuminate\Support\Facades\DB;
 
 class CalendarController extends Controller
 {
@@ -28,7 +29,7 @@ class CalendarController extends Controller
             ->where('bank_account_id', $bankAccountId)
             ->whereBetween('date', [$fromDate, $toDate])
             ->groupBy('ct.color', 'date')
-            ->select('ct.color', 'date', DB::raw('sum(amount) AS total'))
+            ->select('ct.color', 'date', DB::raw('sum(amount) AS total'), DB::raw('MIN(transactions.status) AS status'))
             ->get()
             ->transform(
                 function ($item) {
@@ -36,7 +37,8 @@ class CalendarController extends Controller
                         'name' => number_format(round($item->total, 2), 2),
                         'start' => $item->date,
                         'timed' => false,
-                        'color' => $item->color
+                        'color' => $item->color,
+                        'isPending' => $item->status === 1,
                     ];
                 }
             );
@@ -46,7 +48,16 @@ class CalendarController extends Controller
             ->join('category_types AS ct', 'c.category_type_id', '=', 'ct.id')
             ->where('bank_account_id', $bankAccountId)
             ->whereBetween('date', [$fromDate, $toDate])
-            ->select('transactions.id', 'ct.name AS type', 'ct.color', 'date', 'amount', 'status', 'description')
+            ->select(
+                'transactions.id',
+                'ct.name AS type',
+                'ct.color',
+                'date',
+                'amount',
+                'status',
+                'description',
+                'category_id'
+            )
             ->get();
 
         // Build array of balance per each day in the month
@@ -77,8 +88,8 @@ class CalendarController extends Controller
 
             // Add information to array
             $days[$request->month][$day] = [
-                'balance' => number_format(round($balance, 2), 2),
-                'available' => number_format(round($available, 2), 2),
+                'balance' => round($balance, 2),
+                'available' => round($available, 2),
             ];
         }
 
@@ -89,6 +100,8 @@ class CalendarController extends Controller
                 'events' => $events,
                 'days' => $days,
                 'transactions' => $transactions,
+                'categories' => Category::orderBy('name')->select('id', 'name')->get(),
+                'bankAccountId' => $bankAccountId,
             ]
         );
     }

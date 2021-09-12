@@ -283,7 +283,6 @@ export default {
             const urlAction = this.id ? ".update" : ".store";
 
             const storeData = this.fields;
-            console.log(storeData);
             storeData.scheduleParameter = this.getScheduleParameter();
 
             if (this.fields.limitType === 'Number of transactions') {
@@ -294,7 +293,6 @@ export default {
                 delete storeData.endDate;
                 delete storeData.quantity;
             }
-            console.log(storeData);
 
             axios({
                 url: route(routeName + urlAction, this.id),

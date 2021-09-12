@@ -8,6 +8,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AccountTypeController;
 use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CategoryTypeController;
 use App\Http\Controllers\RecurringTransactionsController;
 
@@ -63,5 +64,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::resource('category', CategoryController::class);
     Route::resource('goal', GoalController::class);
     Route::resource('recurring-transaction', RecurringTransactionsController::class);
+    Route::resource('transactions', TransactionController::class);
 
 });

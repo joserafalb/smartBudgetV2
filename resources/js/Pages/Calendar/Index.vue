@@ -38,23 +38,27 @@
                     @change="getData"
                 >
                     <template v-slot:day-label="{ day, month, date, present }">
-                        <span
-                            :class="{ today: present }"
-                            @click="showDay($event, date)"
-                        >
-                            {{ day }}
+                        <span @click="showDay($event, date)">
+                            <span :class="{ today: present }">
+                                {{ day }}
+                            </span>
+                            <span class="day-label balance">{{
+                                getBalance(month, day)
+                            }}</span>
+                            <span class="day-label available">{{
+                                getAvailable(month, day)
+                            }}</span>
                         </span>
-                        <span class="day-label balance">{{
-                            getBalance(month, day)
-                        }}</span>
-                        <span class="day-label available">{{
-                            getAvailable(month, day)
-                        }}</span>
                     </template>
                     <template v-slot:event="{ event }">
-                        <span class="tw-block tw-text-center tw-w-full">{{
-                            event.name
-                        }}</span>
+                        <span @click="showDay($event, event.start)"
+                            :class="{
+                                'tw-text-green-600': event.color === 'green',
+                                'tw-text-red-600': event.color === 'red'
+                            }"
+                            class="tw-block tw-text-center tw-w-full tw-bg-white tw-text-right"
+                            >{{ event.name }}</span
+                        >
                     </template>
                 </v-calendar>
                 <v-menu
@@ -105,8 +109,12 @@
         </v-col>
         <transaction-dialog
             :dialog="dialog"
-            @cancel="dialog = false"
+            :categories="categories"
+            :selectedItem="selectedItem"
+            :defaultDate="selectedDay.date"
+            @cancel="dialog = selectedOpen = false"
             @save="save"
+            @delete="deleteTransaction"
         ></transaction-dialog>
     </v-row>
 </template>
@@ -116,20 +124,24 @@ import DashboardLayout from "@/Layouts/Dashboard";
 import TransactionDialog from "@/Components/Transaction";
 import moment from "moment";
 
+const formatter = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2
+});
 export default {
     layout: DashboardLayout,
     components: {
         TransactionDialog
     },
     props: {
-        events: { type: Array, required: true },
         days: { type: Object, required: true },
-        transactions: { type: Array, required: true },
-        date: { type: String, required: true }
+        date: { type: String, required: true },
+        categories: { type: Array, required: true },
+        bankAccountId: { type: Number, required: true }
     },
     data() {
         return {
             currentDate: this.$page.props.date,
+            selectedItem: {},
             selectedEvent: {},
             selectedElement: null,
             selectedOpen: false,
@@ -138,7 +150,8 @@ export default {
             title: "",
             isLoading: false,
             dialog: false,
-
+            transactions: this.$page.props.transactions,
+            events: this.$page.props.events
         };
     },
     mounted() {
@@ -146,6 +159,7 @@ export default {
             "hook:destroyed",
             this.$inertia.on("finish", event => {
                 this.isLoading = false;
+                this.events = this.$page.props.events;
             })
         );
     },
@@ -176,13 +190,11 @@ export default {
                     {},
                     { preserveState: true }
                 );
-
                 this.loadData = false;
             }
         },
         showDay(event, date) {
             this.selectedElement = event.target;
-
             const dateObject = moment(date + "T00:00:00");
             const transactions = this.transactions.filter(
                 item => item.date === dateObject.format("YYYY-MM-DD")
@@ -190,7 +202,7 @@ export default {
 
             const open = () => {
                 this.selectedDay = {
-                    date: dateObject.format("MM/DD/YYYY"),
+                    date: dateObject.format("YYYY-MM-DD"),
                     transactions
                 };
                 requestAnimationFrame(() =>
@@ -208,25 +220,157 @@ export default {
             }
         },
         getBalance(month, day) {
-            return this.days[month] ? this.days[month][day]?.balance : "";
+            return this.days[month]
+                ? formatter.format(this.days[month][day]?.balance)
+                : "";
         },
         getAvailable(month, day) {
-            return this.days[month] ? this.days[month][day]?.available : "";
+            return this.days[month]
+                ? formatter.format(this.days[month][day]?.available)
+                : "";
         },
         add() {
+            this.selectedItem = {
+                date: this.selectedDay.date,
+                bankAccountId: this.bankAccountId,
+                categoryId: "",
+                amount: "",
+                description: "",
+                isPending: false
+            };
             this.dialog = true;
-            console.log("add");
         },
-        edit(item) {
-            console.log(item);
+        edit(transaction) {
+            this.selectedItem = {
+                id: transaction.id,
+                date: transaction.date,
+                categoryId: transaction.category_id,
+                amount: transaction.amount,
+                description: transaction.description,
+                isPending: transaction.status === 2,
+                bankAccountId: this.bankAccountId
+            };
+            this.dialog = true;
         },
-        save() {
-            console.log('save');
-            this.dialog = false;
+        deleteTransaction(item) {
+            // Make request to delete from database
+            axios.delete(route("transactions.destroy", item.id)).then(() => {
+                // this.transactions = this.transactions.filter(
+                //     transaction => transaction.id !== item.id
+                // );
+
+                // // Update transactions
+                // this.selectedDay.transactions = this.transactions.filter(
+                //     transaction => transaction.date === item.date
+                // );
+
+                // // Update event
+                // const event = this.events.find(
+                //     event => event.start === item.date
+                // );
+                // if (event) {
+                //     event.name = parseFloat(
+                //         event.name - parseFloat(item.amount)
+                //     );
+                //     if (event.name === 0) {
+                //         this.events = this.events.filter(
+                //             event => event.start !== item.date
+                //         );
+                //     }
+                // }
+
+                // // Update balances
+                // const dateObject = moment(item.date + "T00:00:00");
+                // console.log(
+                //     this.days[dateObject.month() + 1][dateObject.date()].balance
+                // );
+                // console.log(item.amount);
+                // this.days[dateObject.month() + 1][
+                //     dateObject.date()
+                // ].balance += parseFloat(item.amount);
+                // this.days[dateObject.month() + 1][
+                //     dateObject.date()
+                // ].available += parseFloat(item.amount);
+
+                this.dialog = false;
+                this.loadData = true;
+                const date = moment(item.date);
+
+                this.getData({
+                    start: {
+                        date: item.date,
+                        month: date.month() + 1,
+                        year: date.year()
+                    }
+                });
+            });
+        },
+        save(item) {
+            item.status = item.isPending ? 2 : 1;
+            const urlAction = item.id ? ".update" : ".store";
+            axios({
+                url: route("transactions" + urlAction, item.id),
+                method: item.id ? "PUT" : "POST",
+                data: item
+            })
+                .then(response => {
+                    //FIXME: Code needs to be fixed to refresh all the balances, events and transaction information
+
+                    // if (item.id) {
+                    // // Refresh events and transaction objects with the new item information
+                    // const modifiedTransaction = this.transactions.find(
+                    //     transaction => transaction.id === item.id
+                    // );
+                    // const oldAmount = modifiedTransaction.amount;
+                    // modifiedTransaction.amount = item.amount;
+                    // modifiedTransaction.category_id = item.categoryId;
+                    // modifiedTransaction.date = item.date;
+                    // modifiedTransaction.description = item.description;
+                    // modifiedTransaction.status = item.status;
+
+                    // const modifiedEvent = this.events.find(
+                    //     event => event.start === item.date
+                    // );
+                    // modifiedEvent.name = (
+                    //     parseFloat(modifiedEvent.name) -
+                    //     parseFloat(oldAmount) +
+                    //     parseFloat(item.amount)
+                    // ).toFixed(2);
+                    // } else {
+                    //     item.id = response.data;
+
+                    //     // Add new item to events and transactions
+                    // }
+                    this.dialog = false;
+                    this.loadData = true;
+                    const date = moment(item.date);
+
+                    this.getData({
+                        start: {
+                            date: item.date,
+                            month: date.month() + 1,
+                            year: date.year()
+                        }
+                    });
+                })
+                .catch(error => {
+                    this.errorMessage = error.response?.data.errors || [];
+                })
+                .then(() => {});
         }
     }
 };
 </script>
+
+<style lang="postcss">
+.v-event {
+    margin-left: 1px;
+}
+
+.col {
+    @apply tw-px-2;
+}
+</style>
 
 <style lang="postcss" scoped>
 .today {
@@ -235,6 +379,8 @@ export default {
 
 .day-label {
     @apply tw-block tw-text-xs tw-text-blue-500 tw-text-right tw-truncate;
+    font-size: 0.65rem;
+    margin-right: 2px;
 }
 
 .available {
