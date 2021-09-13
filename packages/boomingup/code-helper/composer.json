@@ -1,0 +1,17 @@
+{
+    "name": "boomingup/code-helper",
+    "description": "My personal code helper. Remember to add Boomingup\\CodeHelper\\CodeHelperServiceProvider::class to config/app.php. Also run \"php artisan vendor:publish --tag=public --force\" to public css and js files.",
+    "autoload": {
+        "psr-4": {
+            "Boomingup\\CodeHelper\\": "src/"
+        }
+    },
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Boomingup\\CodeHelper\\CodeHelperServiceProvider"
+            ]
+        }
+    }
+}

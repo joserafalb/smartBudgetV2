@@ -120,6 +120,7 @@
 </template>
 
 <script>
+//TODO: Add $ to trasnactions list, refresh transactions after crud, add mark for pending transactions
 import DashboardLayout from "@/Layouts/Dashboard";
 import TransactionDialog from "@/Components/Transaction";
 import moment from "moment";
