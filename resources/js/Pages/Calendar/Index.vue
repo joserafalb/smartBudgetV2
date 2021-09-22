@@ -35,6 +35,7 @@
                     :events="events"
                     :event-color="getEventColor"
                     type="month"
+                    v-if="days"
                     @change="getData"
                 >
                     <template v-slot:day-label="{ day, month, date, present }">
@@ -42,23 +43,27 @@
                             <span :class="{ today: present }">
                                 {{ day }}
                             </span>
-                            <span class="day-label balance">{{
-                                getBalance(month, day)
-                            }}</span>
+                            <span class="day-label balance"
+                                >{{ getBalance(month, day) }}</span
+                            >
                             <span class="day-label available">{{
                                 getAvailable(month, day)
                             }}</span>
                         </span>
                     </template>
                     <template v-slot:event="{ event }">
-                        <span @click="showDay($event, event.start)"
+                        <span
+                            @click="showDay($event, event.start)"
                             :class="{
                                 'tw-text-green-600': event.color === 'green',
                                 'tw-text-red-600': event.color === 'red'
                             }"
                             class="tw-block tw-text-center tw-w-full tw-bg-white tw-text-right"
-                            >{{ event.name }}</span
-                        >
+                            >{{ event.name }}
+                            <template v-if="event.isPending">
+                                *
+                            </template>
+                            </span>
                     </template>
                 </v-calendar>
                 <v-menu
@@ -90,8 +95,11 @@
                                 class="tw-mt-2"
                                 @click="edit(transaction)"
                                 >{{ transaction.description }}
+                                <template v-if="transaction.status !== 1">
+                                    *
+                                </template>
                                 <v-spacer />
-                                {{ transaction.amount }}
+                                ${{ transaction.amount }}
                             </v-btn>
                         </v-card-text>
                         <v-card-actions>
@@ -120,7 +128,6 @@
 </template>
 
 <script>
-//TODO: Add $ to trasnactions list, refresh transactions after crud, add mark for pending transactions
 import DashboardLayout from "@/Layouts/Dashboard";
 import TransactionDialog from "@/Components/Transaction";
 import moment from "moment";
@@ -134,7 +141,6 @@ export default {
         TransactionDialog
     },
     props: {
-        days: { type: Object, required: true },
         date: { type: String, required: true },
         categories: { type: Array, required: true },
         bankAccountId: { type: Number, required: true }
@@ -152,7 +158,8 @@ export default {
             isLoading: false,
             dialog: false,
             transactions: this.$page.props.transactions,
-            events: this.$page.props.events
+            events: this.$page.props.events,
+            days: this.$page.props.days
         };
     },
     mounted() {
@@ -160,10 +167,22 @@ export default {
             "hook:destroyed",
             this.$inertia.on("finish", event => {
                 this.isLoading = false;
+
+                // Refresh entire calendar data
                 this.events = this.$page.props.events;
+                this.days = this.$page.props.days;
+                this.transactions = this.$page.props.transactions;
+
+                const transactions = this.transactions.filter(
+                    item => item.date === this.selectedDay.date
+                );
+
+                this.selectedDay.transactions = transactions;
             })
         );
     },
+
+    computed: {},
     methods: {
         getEventColor(event) {
             return event.color;
@@ -222,7 +241,7 @@ export default {
         },
         getBalance(month, day) {
             return this.days[month]
-                ? formatter.format(this.days[month][day]?.balance)
+                ? formatter.format(this.days[month]?.[day]?.balance)
                 : "";
         },
         getAvailable(month, day) {

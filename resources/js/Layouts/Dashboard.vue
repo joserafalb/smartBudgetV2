@@ -145,7 +145,7 @@ export default {
                     }
                 ]
             },
-            { title: "Calendar", inertia: "/calendar" }
+            { title: "Calendar", inertia: "/calendar/2021/09" }
         ]
     }),
     methods: {

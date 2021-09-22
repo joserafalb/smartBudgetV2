@@ -38,7 +38,7 @@ class CalendarController extends Controller
                         'start' => $item->date,
                         'timed' => false,
                         'color' => $item->color,
-                        'isPending' => $item->status === 1,
+                        'isPending' => $item->status !== 1,
                     ];
                 }
             );
@@ -87,7 +87,7 @@ class CalendarController extends Controller
             }
 
             // Add information to array
-            $days[$request->month][$day] = [
+            $days[intval($request->month)][$day] = [
                 'balance' => round($balance, 2),
                 'available' => round($available, 2),
             ];
