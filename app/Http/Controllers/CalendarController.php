@@ -10,6 +10,9 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Classes\BalanceHelper;
 use Illuminate\Support\Facades\DB;
+use App\Models\RecurringTransactions;
+use App\Http\Controllers\RecurringTransactionsController;
+use App\Models\RecurringTransactionLog;
 
 class CalendarController extends Controller
 {
@@ -18,6 +21,9 @@ class CalendarController extends Controller
         $fromDate = Carbon::create($request->year, $request->month);
         $toDate = Carbon::create($request->year, $request->month)->endOfMonth();
         $bankAccountId = $request->account ?? BankAccount::where('active', 1)->first()->id;
+
+        // Create recurring transactions
+        $this->createRecurringTransactions($fromDate, $toDate, $bankAccountId);
 
         // Get the balance on the first day of the month
         $balance = BalanceHelper::getBalanceAtDate($fromDate, $bankAccountId);
@@ -104,5 +110,46 @@ class CalendarController extends Controller
                 'bankAccountId' => $bankAccountId,
             ]
         );
+    }
+
+    private function createRecurringTransactions($fromDate, $toDate, $bankAccountId): void
+    {
+        // Pull all the recurring transactions that already started
+        $recurringTrasnactions = RecurringTransactions::where('start_date', '<=', $fromDate)
+            ->where('end_date', '>=', $fromDate)
+            ->get();
+
+        foreach ($recurringTrasnactions as $recurringTrasnaction) {
+            // Get the days we need to add this recurring transaction
+            $dates = RecurringTransactionsController::getDaysToAdd($recurringTrasnaction, $fromDate, $toDate);
+
+            // Loop all dates to add the transactions
+            foreach ($dates as $date) {
+                // Check if we need to add this transaction
+                $RecurringTransactionLog = RecurringTransactionLog::where('recurring_transactions_id', $recurringTrasnaction->id)
+                    ->where('creation_date', $date)
+                    ->first();
+
+                if ($RecurringTransactionLog === null) {
+                    RecurringTransactionLog::create(
+                        [
+                            'recurring_transactions_id' => $recurringTrasnaction->id,
+                            'creation_date' => $date,
+                        ]
+                    );
+
+                    Transaction::create(
+                        [
+                            'description' => $recurringTrasnaction->description,
+                            'date' => $date,
+                            'category_id' => $recurringTrasnaction->category_id,
+                            'amount' => $recurringTrasnaction->amount,
+                            'status' => TransactionController::STATUS_PENDING,
+                            'bank_account_id' => $recurringTrasnaction->bank_account_id,
+                        ]
+                    );
+                }
+            }
+        }
     }
 }

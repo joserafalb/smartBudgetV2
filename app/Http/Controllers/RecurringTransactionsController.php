@@ -96,11 +96,69 @@ class RecurringTransactionsController extends Controller
 
         if (!empty($request->item['quantity'])) {
             $data['quantity'] = $request->item['quantity'];
+            $data['end_date'] =  $this->getEndDate($request->item);
         } else if (!empty($request->item['end_date'])) {
             $data['end_date'] = $request->item['endDate'];
         }
+
         $newRow = RecurringTransactions::create($data);
         return response()->json($newRow->id);
+    }
+
+    private function getEndDate($data)
+    {
+        if ($data['limitType'] === 'Number of transactions') {
+            // Calculate end_date
+            $scheduleType = $data['scheduleType'];
+            $transactionsQuantity = $data['quantity'];
+            $startDate = $data['startDate'];
+            $scheduleParameter = $data['scheduleParameter'];
+
+            $startDateObject = \DateTime::createFromFormat(
+                'Y-m-d',
+                $startDate
+            );
+
+            // If the start day is before or the same as the schedule parameter then deduct 1 to $transactionsQuantity
+            if ($startDateObject->format('d') <= $scheduleParameter) {
+                $transactionsQuantity--;
+            }
+
+            $endDate = '';
+            switch ($scheduleType) {
+                case 1:
+                    // Calculate how many days we need to sum
+                    $addDays = $scheduleParameter * $transactionsQuantity;
+                    $startDateObject->add(new \DateInterval('P' . $addDays  . 'D'));
+                    $endDate = $startDateObject->format('Y-m-d');
+                    break;
+                case 2:
+                    $startDateObject->add(new \DateInterval('P' . $transactionsQuantity . 'M'));
+                    $endDate = $startDateObject->format('Y-m-' . $scheduleParameter);
+                    break;
+                case 3:
+                    $startDateObject->add(new \DateInterval('P' . $transactionsQuantity . 'M'));
+                    $endDate = $startDateObject->format('Y-m-t');
+                    break;
+                case 4:
+                    // Find the real starting day
+                    if ($startDateObject->format('l') !== $scheduleParameter) {
+                        $startDateObject->modify('next ' . strtolower($scheduleParameter));
+                    }
+
+                    // Calculate how many days we need to add
+                    $addDays = 7 * $transactionsQuantity;
+                    $startDateObject->add(new \DateInterval('P' . $addDays  . 'D'));
+                    $endDate = $startDateObject->format('Y-m-d');
+                    break;
+                default:
+                    return null;
+                    break;
+            }
+            return $endDate;
+        }
+
+        return null;
     }
 
     /**
@@ -176,9 +234,11 @@ class RecurringTransactionsController extends Controller
 
         if (!empty($request->item['quantity'])) {
             $recurring_transaction->quantity = $request->item['quantity'];
+            $recurring_transaction->end_date = $this->getEndDate($request->item);
         } else if (!empty($request->item['endDate'])) {
             $recurring_transaction->end_date = $request->item['endDate'];
         }
+
         $recurring_transaction->save();
     }
 
@@ -191,5 +251,22 @@ class RecurringTransactionsController extends Controller
     public function destroy(RecurringTransactions $recurring_transaction)
     {
         $recurring_transaction->delete();
+    }
+
+    public static function getDaysToAdd($recurringTrasnaction, $fromDate, $toDate)
+    {
+        $days = [];
+
+        if (
+            $recurringTrasnaction->schedule_type === 2 ||
+            $recurringTrasnaction->schedule_type === 3
+        ) {
+
+            $days[] = $fromDate->format('Y-m-') . $recurringTrasnaction->schedule_parameter;
+
+        } else {
+        }
+
+        return $days;
     }
 }

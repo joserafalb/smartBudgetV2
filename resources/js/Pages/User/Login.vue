@@ -13,12 +13,13 @@
                     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                     :rules="[rules.required, rules.min]"
                     :type="showPassword ? 'text' : 'password'"
-                    name="input-10-1"
+                    name="password"
                     label="Password"
                     counter
                     @click:append="showPassword = !showPassword"
                 ></v-text-field>
                 <v-checkbox
+                    name="remember"
                     v-model="form.rememberMe"
                     label="Remember me"
                 ></v-checkbox>
@@ -74,7 +75,7 @@ export default {
             this.form
                 .transform(data => ({
                     ...data,
-                    rememberMe: data.rememberMe ? "on" : ""
+                    remember: data.rememberMe ? "on" : ""
                 }))
                 .post("/login");
         }
