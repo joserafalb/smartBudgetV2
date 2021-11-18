@@ -75,7 +75,7 @@ export default {
             this.form
                 .transform(data => ({
                     ...data,
-                    remember: data.rememberMe ? "on" : ""
+                    remember: data.rememberMe
                 }))
                 .post("/login");
         }
