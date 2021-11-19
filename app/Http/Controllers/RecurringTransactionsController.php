@@ -7,11 +7,17 @@ use App\Models\Category;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\RecurringTransactions;
+use Carbon\Carbon;
 
 class RecurringTransactionsController extends Controller
 {
     const LIST_VIEW = 'RecurringTransaction/List';
     const EDIT_VIEW = 'RecurringTransaction/Edit';
+
+    const SCHEDULE_TYPE_REPEAT_EVERY = 1;
+    const SCHEDULE_TYPE_EVERY_DAY_MONTH = 2;
+    const SCHEDULE_TYPE_EVERY_LAST_DAY_MONTH = 3;
+    const SCHEDULE_TYPE_EVERY_DAY_WEEK = 4;
 
     const VALIDATIONS = [
         'item' => 'array',
@@ -255,18 +261,29 @@ class RecurringTransactionsController extends Controller
 
     public static function getDaysToAdd($recurringTrasnaction, $fromDate, $toDate)
     {
-        $days = [];
+        $dates = [];
 
-        if (
-            $recurringTrasnaction->schedule_type === 2 ||
-            $recurringTrasnaction->schedule_type === 3
-        ) {
+        switch ($recurringTrasnaction->schedule_type) {
+            case self::SCHEDULE_TYPE_EVERY_DAY_MONTH:
+            case self::SCHEDULE_TYPE_EVERY_LAST_DAY_MONTH:
 
-            $days[] = $fromDate->format('Y-m-') . $recurringTrasnaction->schedule_parameter;
+                // Only one day per month, it set by the parameter
+                $dates[] = $fromDate->format('Y-m-') . $recurringTrasnaction->schedule_parameter;
+                break;
+            case self::SCHEDULE_TYPE_REPEAT_EVERY:
 
-        } else {
+                // Multiple days, set the first date to add using the value from the table
+                $date = Carbon::parse($recurringTrasnaction->start_date);
+
+                // Sum the quantity of days in the parameter to get the other dates
+                do {
+                    $dates[] = $date->format('Y-m-d');
+                    $date->addDays($recurringTrasnaction->schedule_parameter);
+                } while ($fromDate->month === $date->month);
+
+                break;
         }
 
-        return $days;
+        return $dates;
     }
 }

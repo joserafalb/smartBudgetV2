@@ -115,9 +115,15 @@ class CalendarController extends Controller
     private function createRecurringTransactions($fromDate, $toDate, $bankAccountId): void
     {
         // Pull all the recurring transactions that already started
-        $recurringTrasnactions = RecurringTransactions::where('start_date', '<=', $fromDate)
-            ->where('end_date', '>=', $fromDate)
+        $recurringTrasnactions = RecurringTransactions::where('start_date', '<=', $toDate)
+            ->where(
+                function ($query) use ($fromDate) {
+                    $query->where('end_date', '>=', $fromDate)
+                        ->orWhere('limit_type', 'None');
+                }
+            )
             ->get();
+
 
         foreach ($recurringTrasnactions as $recurringTrasnaction) {
             // Get the days we need to add this recurring transaction
