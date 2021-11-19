@@ -124,7 +124,6 @@ class CalendarController extends Controller
             )
             ->get();
 
-
         foreach ($recurringTrasnactions as $recurringTrasnaction) {
             // Get the days we need to add this recurring transaction
             $dates = RecurringTransactionsController::getDaysToAdd($recurringTrasnaction, $fromDate, $toDate);

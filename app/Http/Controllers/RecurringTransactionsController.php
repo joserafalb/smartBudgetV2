@@ -272,8 +272,13 @@ class RecurringTransactionsController extends Controller
                 break;
             case self::SCHEDULE_TYPE_REPEAT_EVERY:
 
-                // Multiple days, set the first date to add using the value from the table
+                // Multiple days. Find the first date of the current month
                 $date = Carbon::parse($recurringTrasnaction->start_date);
+
+                // Add quantity of days until we get to the current month
+                while (!($date->month === $fromDate->month && $date->year === $fromDate->year)) {
+                    $date->addDays($recurringTrasnaction->schedule_parameter);
+                }
 
                 // Sum the quantity of days in the parameter to get the other dates
                 do {
