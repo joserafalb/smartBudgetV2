@@ -135,6 +135,7 @@ class CalendarController extends Controller
                     ->where('creation_date', $date)
                     ->first();
 
+                // Check if we didn't add this recurrring transaction
                 if ($RecurringTransactionLog === null) {
                     RecurringTransactionLog::create(
                         [
