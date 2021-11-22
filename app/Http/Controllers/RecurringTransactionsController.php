@@ -103,7 +103,7 @@ class RecurringTransactionsController extends Controller
         if (!empty($request->item['quantity'])) {
             $data['quantity'] = $request->item['quantity'];
             $data['end_date'] =  $this->getEndDate($request->item);
-        } else if (!empty($request->item['end_date'])) {
+        } elseif (!empty($request->item['end_date'])) {
             $data['end_date'] = $request->item['endDate'];
         }
 
@@ -241,7 +241,7 @@ class RecurringTransactionsController extends Controller
         if (!empty($request->item['quantity'])) {
             $recurring_transaction->quantity = $request->item['quantity'];
             $recurring_transaction->end_date = $this->getEndDate($request->item);
-        } else if (!empty($request->item['endDate'])) {
+        } elseif (!empty($request->item['endDate'])) {
             $recurring_transaction->end_date = $request->item['endDate'];
         }
 
@@ -266,12 +266,10 @@ class RecurringTransactionsController extends Controller
         switch ($recurringTrasnaction->schedule_type) {
             case self::SCHEDULE_TYPE_EVERY_DAY_MONTH:
             case self::SCHEDULE_TYPE_EVERY_LAST_DAY_MONTH:
-
                 // Only one day per month, it set by the parameter
                 $dates[] = $fromDate->format('Y-m-') . $recurringTrasnaction->schedule_parameter;
                 break;
             case self::SCHEDULE_TYPE_REPEAT_EVERY:
-
                 // Multiple days. Find the first date of the current month
                 $date = Carbon::parse($recurringTrasnaction->start_date);
 

@@ -69,7 +69,6 @@ class CalendarController extends Controller
         // Build array of balance per each day in the month
         $days = [];
         for ($day = 1; $day <= $toDate->day; $day++) {
-
             // Search for transactions on each day
             $filteredTransactions = $transactions->filter(
                 function ($item) use ($toDate, $day) {
@@ -131,7 +130,8 @@ class CalendarController extends Controller
             // Loop all dates to add the transactions
             foreach ($dates as $date) {
                 // Check if we need to add this transaction
-                $RecurringTransactionLog = RecurringTransactionLog::where('recurring_transactions_id', $recurringTrasnaction->id)
+                $RecurringTransactionLog = RecurringTransactionLog
+                    ::where('recurring_transactions_id', $recurringTrasnaction->id)
                     ->where('creation_date', $date)
                     ->first();
 
