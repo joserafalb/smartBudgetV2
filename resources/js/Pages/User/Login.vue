@@ -38,7 +38,6 @@
             <inertia-link href="/forgot-password"
                 >Forgot my password</inertia-link
             >
-            <inertia-link href="/register">Register</inertia-link>
         </v-card-actions>
     </web-layout>
 </template>

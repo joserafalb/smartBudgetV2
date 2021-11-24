@@ -20,7 +20,19 @@ class CalendarController extends Controller
     {
         $fromDate = Carbon::create($request->year, $request->month);
         $toDate = Carbon::create($request->year, $request->month)->endOfMonth();
-        $bankAccountId = $request->account ?? BankAccount::where('active', 1)->first()->id;
+        $bankAccount = $request->account ?? BankAccount::where('active', 1)->first();
+
+        if ($bankAccount) {
+            $bankAccountId = $bankAccount->id;
+        } else {
+            //FIXME: return error message
+            return Inertia::render(
+                'Calendar/Index',
+                [
+                    'date' => $fromDate->format('Y-m-d'),
+                ]
+            );
+        }
 
         // Create recurring transactions
         $this->createRecurringTransactions($fromDate, $toDate, $bankAccountId);

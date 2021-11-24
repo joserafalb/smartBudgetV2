@@ -35,9 +35,9 @@ Route::get('/forgot-password', function () {
     return Inertia::render('User/ForgotPassword');
 });
 
-Route::get('/register', function () {
-    return Inertia::render('User/Register');
-});
+// Route::get('/register', function () {
+//     return Inertia::render('User/Login');
+// });
 
 Route::get('/reset-password', function () {
     return Inertia::render('User/ResetPassword', [
