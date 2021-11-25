@@ -54,12 +54,8 @@
                     <template v-slot:event="{ event }">
                         <span
                             @click="showDay($event, event.start)"
-                            :class="{
-                                'tw-text-green-600': event.color === 'green',
-                                'tw-text-red-600': event.color === 'red',
-                                'tw-text-blue-600': event.color === 'blue'
-                            }"
-                            class="tw-block tw-text-center tw-w-full tw-bg-white tw-text-right"
+                            :style="{ color: event.color }"
+                            class="tw-block tw-w-full tw-bg-white tw-text-right"
                             >{{ event.name }}
                             <template v-if="event.isPending">
                                 *

@@ -66,6 +66,7 @@ class CategoryTypeController extends Controller
         $newRow = CategoryType::create([
             'active' => $request->active ?? false,
             'name' => $request->name,
+            'color' => $request->color,
         ]);
 
         return response()->json($newRow->id);
@@ -110,6 +111,7 @@ class CategoryTypeController extends Controller
 
         $categoryType->name = $request->name;
         $categoryType->active = $request->active ?? false;
+        $categoryType->color = $request->color;
         $categoryType->save();
     }
 
