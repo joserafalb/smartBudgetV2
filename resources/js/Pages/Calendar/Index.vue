@@ -43,9 +43,9 @@
                             <span :class="{ today: present }">
                                 {{ day }}
                             </span>
-                            <span class="day-label balance"
-                                >{{ getBalance(month, day) }}</span
-                            >
+                            <span class="day-label balance">{{
+                                getBalance(month, day)
+                            }}</span>
                             <span class="day-label available">{{
                                 getAvailable(month, day)
                             }}</span>
@@ -56,14 +56,15 @@
                             @click="showDay($event, event.start)"
                             :class="{
                                 'tw-text-green-600': event.color === 'green',
-                                'tw-text-red-600': event.color === 'red'
+                                'tw-text-red-600': event.color === 'red',
+                                'tw-text-blue-600': event.color === 'blue'
                             }"
                             class="tw-block tw-text-center tw-w-full tw-bg-white tw-text-right"
                             >{{ event.name }}
                             <template v-if="event.isPending">
                                 *
                             </template>
-                            </span>
+                        </span>
                     </template>
                 </v-calendar>
                 <v-menu
