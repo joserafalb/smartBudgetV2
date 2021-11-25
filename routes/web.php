@@ -23,7 +23,7 @@ use App\Http\Controllers\RecurringTransactionsController;
 |
 */
 
-Route::get('/', function () {
+Route::get('/login', function () {
     return Inertia::render('User/Login');
 })->name('login');
 
@@ -47,23 +47,26 @@ Route::get('/reset-password', function () {
 })->name('password.reset');
 
 // Authenticated links
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+Route::middleware(['auth:sanctum', 'verified'])->group(
+    function () {
+        Route::get('/', [CalendarController::class, 'index'])->name('calendar.index');
 
-    Route::get('calendar/{year}/{month}', [CalendarController::class, 'index'])->name('calendar.index');
+        Route::get('/dashboard', function () {
+            return Inertia::render('Dashboard');
+        })->name('dashboard');
 
-    /**
-     * Resource routes
-     */
-    Route::resource('banks', BankController::class);
-    Route::resource('account-type', AccountTypeController::class);
-    Route::resource('bank-accounts', BankAccountController::class);
-    Route::resource('category-type', CategoryTypeController::class);
-    Route::resource('category', CategoryController::class);
-    Route::resource('goal', GoalController::class);
-    Route::resource('recurring-transaction', RecurringTransactionsController::class);
-    Route::resource('transactions', TransactionController::class);
+        Route::get('calendar/{year}/{month}', [CalendarController::class, 'index'])->name('calendar.index');
 
-});
+        /**
+         * Resource routes
+         */
+        Route::resource('banks', BankController::class);
+        Route::resource('account-type', AccountTypeController::class);
+        Route::resource('bank-accounts', BankAccountController::class);
+        Route::resource('category-type', CategoryTypeController::class);
+        Route::resource('category', CategoryController::class);
+        Route::resource('goal', GoalController::class);
+        Route::resource('recurring-transaction', RecurringTransactionsController::class);
+        Route::resource('transactions', TransactionController::class);
+    }
+);

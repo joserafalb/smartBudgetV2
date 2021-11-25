@@ -25,13 +25,13 @@ class CalendarController extends Controller
         if ($bankAccount) {
             $bankAccountId = $bankAccount->id;
         } else {
-            //FIXME: return error message
-            return Inertia::render(
-                'Calendar/Index',
-                [
-                    'date' => $fromDate->format('Y-m-d'),
+            return ErrorController::showErrorMessage([
+                'message' => 'There are no bank accounts created.',
+                'tip' => [
+                    'message' => 'Please create a new bank account first.',
+                    'link' => Route('bank-accounts.index'),
                 ]
-            );
+            ]);
         }
 
         // Create recurring transactions

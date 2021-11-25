@@ -37,7 +37,19 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request)
     {
         return array_merge(parent::share($request), [
-            //
+            // Lazily
+            'auth.user' => function () use ($request) {
+                if ($request->user()) {
+                    $userInfo = $request->user()->only('id', 'name', 'email');
+
+                    // Get initials from name: https://stackoverflow.com/questions/65431209/get-initials-from-full-names-in-php-array
+                    $userInfo['initials'] = preg_replace('/(?<=\w)./', '', $userInfo['name']);
+
+                    return $userInfo;
+                } else {
+                    return null;
+                }
+            }
         ]);
     }
 }

@@ -1,6 +1,10 @@
 <template>
     <v-app>
-        <v-navigation-drawer app v-model="drawer" v-if="$vuetify.breakpoint.smAndDown">
+        <v-navigation-drawer
+            app
+            v-model="drawer"
+            v-if="$vuetify.breakpoint.smAndDown"
+        >
             <v-list>
                 <div v-for="(menu, index) in menuItems" :key="index">
                     <v-list-group v-if="menu.items" :value="false" no-action>
@@ -37,7 +41,10 @@
                 @click="drawer = !drawer"
             ></v-app-bar-nav-icon>
             <v-toolbar-title>Smart Budget</v-toolbar-title>
-            <div v-for="(menu, index) in menuItems" v-if="$vuetify.breakpoint.mdAndUp">
+            <div
+                v-for="(menu, index) in menuItems"
+                v-if="$vuetify.breakpoint.mdAndUp"
+            >
                 <v-menu open-on-hover offset-y :key="index" v-if="menu.items">
                     <template v-slot:activator="{ on, attrs }">
                         <span v-bind="attrs" v-on="on" class="menuItem">
@@ -114,16 +121,17 @@
 import { Link } from "@inertiajs/inertia-vue";
 
 export default {
+    computed: {
+        user() {
+            return this.$page.props.auth.user;
+        }
+    },
     components: {
         Link: Link
     },
     data: () => ({
         drawer: false,
-        user: {
-            initials: "JD",
-            fullName: "John Doe",
-            email: "john.doe@doe.com"
-        },
+
         menuItems: [
             {
                 title: "Manage Accounts",
@@ -145,7 +153,7 @@ export default {
                     }
                 ]
             },
-            { title: "Calendar", inertia: "/calendar/2021/09" }
+            { title: "Calendar", inertia: "/" }
         ]
     }),
     methods: {
