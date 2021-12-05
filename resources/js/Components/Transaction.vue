@@ -1,6 +1,6 @@
 <template>
     <v-dialog v-model="dialog" persistent>
-        <v-card>
+        <v-card class="editPageCard">
             <v-card-title class="text-h5">
                 {{ title }}
                 <v-spacer />
@@ -102,3 +102,9 @@ export default {
     }
 };
 </script>
+
+<style lang="postcss" scoped>
+.editPageCard {
+    @apply tw-max-w-md tw-m-auto;
+}
+</style>

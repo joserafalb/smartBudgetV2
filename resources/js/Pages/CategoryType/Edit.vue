@@ -72,7 +72,7 @@ export default {
             active: this.$page.props.item?.active,
             errorMessage: {},
             id: this.$page.props.item?.id,
-            color: this.$page.props.item?.color,
+            color: this.$page.props.item?.color || "#000",
             ask: "!#XXXXXXXX",
             menu: false
         };

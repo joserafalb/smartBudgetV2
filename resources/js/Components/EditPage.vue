@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card class="editPageCard">
         <v-card-title>{{ title }}</v-card-title>
         <v-card-text>
             <v-alert
@@ -69,3 +69,9 @@ export default {
     }
 };
 </script>
+
+<style lang="postcss" scoped>
+.editPageCard {
+    @apply tw-max-w-md tw-m-auto;
+}
+</style>
