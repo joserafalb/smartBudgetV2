@@ -237,6 +237,7 @@ export default {
             }
         },
         getBalance(month, day) {
+            console.log(this.days);
             return this.days[month]
                 ? formatter.format(this.days[month]?.[day]?.balance)
                 : "";

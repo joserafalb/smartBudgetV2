@@ -18,8 +18,14 @@ class CalendarController extends Controller
 {
     public function index(Request $request)
     {
-        $fromDate = Carbon::create($request->year, $request->month);
-        $toDate = Carbon::create($request->year, $request->month)->endOfMonth();
+        if (isset($request->year) && isset($request->month)) {
+            $fromDate = Carbon::create($request->year, $request->month);
+            $toDate = Carbon::create($request->year, $request->month)->endOfMonth();
+        } else {
+            // Default to current month and year
+            $fromDate = Carbon::now()->firstOfMonth();
+            $toDate = Carbon::now()->endOfMonth();
+        }
 
         // Get Bank to display
         $bankAccount = $request->account ?? BankAccount::where('active', 1)->first();
@@ -105,7 +111,7 @@ class CalendarController extends Controller
             }
 
             // Add information to array
-            $days[intval($request->month)][$day] = [
+            $days[intval($fromDate->format('m'))][$day] = [
                 'balance' => round($balance, 2),
                 'available' => round($available, 2),
             ];
