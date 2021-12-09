@@ -43,6 +43,7 @@ class PaymentReminderNotification extends Command
         // Get all transactions that are still pending and are due in the next 2 days
         $transactions = Transaction::where('status', 2)
             ->where('date', '<=', now()->addDays(4)->setTime(0, 0, 0)->toDateString())
+            ->where('notification_count', '<', 3)
             ->get();
 
         // Loop all transactions
@@ -51,7 +52,7 @@ class PaymentReminderNotification extends Command
             EmailSender::sendTransactionalEmail(
                 'joserafalb@gmail.com',
                 'Jose Lopez',
-                2,
+                '2',
                 [
                     'DESCRIPTION' => $transaction->description,
                     'DATE' => $transaction->date,
