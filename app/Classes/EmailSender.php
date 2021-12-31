@@ -4,12 +4,23 @@ namespace App\Classes;
 
 class EmailSender
 {
+
+    /**
+     * Sends a request to send in blue api to send a transactional
+     *
+     * @param string email the receipt email address
+     * @param string name the name of the email receipt
+     * @param int templateId The id of the send in blue template
+     * @param array params parameters of the trasnactional
+     *
+     * @return string
+     */
     public static function sendTransactionalEmail(
-        $email,
-        $name,
-        $templateId,
-        $params
-    ) {
+        String $email,
+        String $name,
+        Int $templateId,
+        array $params
+    ): String {
         // Configure API key authorization: api-key
         $config = \SendinBlue\Client\Configuration::getDefaultConfiguration()
             ->setApiKey('api-key', env('EMAILINBLUE_API_TOKEN'));

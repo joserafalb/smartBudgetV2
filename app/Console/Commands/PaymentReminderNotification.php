@@ -52,7 +52,7 @@ class PaymentReminderNotification extends Command
             EmailSender::sendTransactionalEmail(
                 'joserafalb@gmail.com',
                 'Jose Lopez',
-                '2',
+                2,
                 [
                     'DESCRIPTION' => $transaction->description,
                     'DATE' => $transaction->date,
