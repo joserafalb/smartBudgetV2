@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Classes\EmailSender;
+use App\Http\Controllers\TransactionController;
 use App\Models\Transaction;
 use Illuminate\Console\Command;
 
@@ -41,7 +42,7 @@ class PaymentReminderNotification extends Command
     {
 
         // Get all transactions that are still pending and are due in the next 2 days
-        $transactions = Transaction::where('status', 2)
+        $transactions = Transaction::where('status', TransactionController::STATUS_PENDING)
             ->where('date', '<=', now()->addDays(4)->setTime(0, 0, 0)->toDateString())
             ->where('notification_count', '<', 3)
             ->get();
