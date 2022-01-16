@@ -102,7 +102,7 @@ class CalendarController extends Controller
                     $amount = $amount * -1;
                 }
 
-                if ($transaction->status === 1) {
+                if ($transaction->status === TransactionController::STATUS_PROCESSED) {
                     $balance += $amount;
                     $available += $amount;
                 } else {
