@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use App\Http\Controllers\TransactionController;
 use App\Models\BankAccount;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
@@ -12,9 +13,9 @@ class BalanceHelper
     {
         $balance = BankAccount::findOrFail($bankAccountId)->only('initial_balance')['initial_balance'];
 
-        $transactionStatus = [1];
+        $transactionStatus = [TransactionController::STATUS_PROCESSED];
         if ($pending) {
-            $transactionStatus[] = 2;
+            $transactionStatus[] = TransactionController::STATUS_PENDING;
         }
 
         $transactions = Transaction::join('categories AS c', 'c.id', '=', 'category_id')

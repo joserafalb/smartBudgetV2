@@ -50,10 +50,15 @@
                     label="Description"
                     required
                 />
-                <v-switch
-                    v-model="defaultItem.isPending"
-                    :label="getPendingLabel"
-                />
+                <v-slider
+                    label="Status"
+                    v-model="defaultItem.transactionStatus"
+                    :tick-labels="statusLabels"
+                    :max="2"
+                    step="1"
+                    ticks="always"
+                    tick-size="2"
+                ></v-slider>
             </v-card-text>
             <v-card-actions>
                 <v-btn color="green darken-1" text @click="$emit('cancel')">
@@ -84,15 +89,13 @@ export default {
     data() {
         return {
             datePicker: false,
-            defaultItem: {}
+            defaultItem: {},
+            statusLabels: ["Pending", "Processing", "Processed"]
         };
     },
     computed: {
         title() {
             return this.id ? "Update Transaction" : "Add Transaction";
-        },
-        getPendingLabel() {
-            return this.defaultItem.isPending ? "Pending" : "Processed";
         }
     },
     watch: {

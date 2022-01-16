@@ -63,7 +63,7 @@ class CalendarController extends Controller
                         'start' => $item->date,
                         'timed' => false,
                         'color' => $item->color,
-                        'isPending' => $item->status !== 1,
+                        'isPending' => $item->status == TransactionController::STATUS_PENDING,
                     ];
                 }
             );

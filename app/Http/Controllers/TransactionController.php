@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    const STATUS_PROCESSED = 1;
-    const STATUS_PENDING = 2;
+    const STATUS_PROCESSED = 2;
+    const STATUS_PENDING = 0;
 
     /**
      * Display a listing of the resource.

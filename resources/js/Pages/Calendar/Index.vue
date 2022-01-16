@@ -92,7 +92,7 @@
                                 class="tw-mt-2"
                                 @click="edit(transaction)"
                                 >{{ transaction.description }}
-                                <template v-if="transaction.status !== 1">
+                                <template v-if="transaction.status === 0">
                                     *
                                 </template>
                                 <v-spacer />
@@ -237,7 +237,6 @@ export default {
             }
         },
         getBalance(month, day) {
-            console.log(this.days);
             return this.days[month]
                 ? formatter.format(this.days[month]?.[day]?.balance)
                 : "";
@@ -254,7 +253,7 @@ export default {
                 categoryId: "",
                 amount: "",
                 description: "",
-                isPending: false
+                transactionStatus: 2
             };
             this.dialog = true;
         },
@@ -265,7 +264,7 @@ export default {
                 categoryId: transaction.category_id,
                 amount: transaction.amount,
                 description: transaction.description,
-                isPending: transaction.status === 2,
+                transactionStatus: transaction.status,
                 bankAccountId: this.bankAccountId
             };
             this.dialog = true;
@@ -324,7 +323,7 @@ export default {
             });
         },
         save(item) {
-            item.status = item.isPending ? 2 : 1;
+            item.status = item.transactionStatus;
             const urlAction = item.id ? ".update" : ".store";
             axios({
                 url: route("transactions" + urlAction, item.id),
