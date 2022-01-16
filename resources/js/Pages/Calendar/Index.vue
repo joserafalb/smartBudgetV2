@@ -92,7 +92,7 @@
                                 class="tw-mt-2"
                                 @click="edit(transaction)"
                                 >{{ transaction.description }}
-                                <template v-if="transaction.status === 0">
+                                <template v-if="transaction.status !== 2">
                                     *
                                 </template>
                                 <v-spacer />
