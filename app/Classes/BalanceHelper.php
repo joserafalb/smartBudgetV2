@@ -16,6 +16,7 @@ class BalanceHelper
         $transactionStatus = [TransactionController::STATUS_PROCESSED];
         if ($pending) {
             $transactionStatus[] = TransactionController::STATUS_PENDING;
+            $transactionStatus[] = TransactionController::STATUS_PROCESSING;
         }
 
         $transactions = Transaction::join('categories AS c', 'c.id', '=', 'category_id')

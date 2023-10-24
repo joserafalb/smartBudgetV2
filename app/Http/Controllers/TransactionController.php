@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     const STATUS_PROCESSED = 2;
+    const STATUS_PROCESSING = 1;
     const STATUS_PENDING = 0;
 
     /**
