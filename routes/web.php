@@ -55,8 +55,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
-        Route::get('calendar/{year}/{month}', [CalendarController::class, 'index'])->name('calendar.index');
+        //Route::get('calendar/{year}/{month}', [CalendarController::class, 'index'])->name('calendar.index');
 
+        Route::get('calendar/{year}/{month}/{account}', [CalendarController::class, 'index'])->name('calendar.index');
         /**
          * Resource routes
          */

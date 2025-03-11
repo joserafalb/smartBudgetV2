@@ -18,6 +18,7 @@ class CalendarController extends Controller
 {
     public function index(Request $request)
     {
+
         if (isset($request->year) && isset($request->month)) {
             $fromDate = Carbon::create($request->year, $request->month);
             $toDate = Carbon::create($request->year, $request->month)->endOfMonth();
@@ -28,7 +29,8 @@ class CalendarController extends Controller
         }
 
         // Get Bank to display
-        $bankAccount = $request->account ?? BankAccount::where('active', 1)->first();
+        $bankAccount = isset($request->account) ? BankAccount::findOrFail($request->account) : BankAccount::where('active', 1)->first();
+        //dd($bankAccount);
         if ($bankAccount) {
             $bankAccountId = $bankAccount->id;
         } else {
@@ -126,6 +128,7 @@ class CalendarController extends Controller
                 'transactions' => $transactions,
                 'categories' => Category::orderBy('name')->select('id', 'name')->get(),
                 'bankAccountId' => $bankAccountId,
+                'bankAccounts' => BankAccount::where('active', 1)->get(),
             ]
         );
     }

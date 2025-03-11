@@ -3,6 +3,16 @@
         <v-progress-linear indeterminate v-if="isLoading"></v-progress-linear>
         <v-col>
             <v-sheet height="64">
+                <v-autocomplete
+                    v-model="bankAccountId"
+                    :items="bankAccounts"
+                    item-text="name"
+                    item-value="id"
+                    label="Bank Account"
+                    @change="changeBank"
+                ></v-autocomplete>
+            </v-sheet>
+            <v-sheet height="64">
                 <v-toolbar flat>
                     <v-btn
                         outlined
@@ -140,7 +150,10 @@ export default {
     props: {
         date: { type: String, required: true },
         categories: { type: Array, required: true },
-        bankAccountId: { type: Number, required: true }
+        bankAccounts: {
+            type: Array,
+            required: true
+        },
     },
     data() {
         return {
@@ -156,7 +169,8 @@ export default {
             dialog: false,
             transactions: this.$page.props.transactions,
             events: this.$page.props.events,
-            days: this.$page.props.days
+            days: this.$page.props.days,
+            bankAccountId: this.$page.props.bankAccountId
         };
     },
     mounted() {
@@ -195,6 +209,18 @@ export default {
             this.loadData = true;
             this.$refs.calendar.next();
         },
+        changeBank() {
+            this.loadData = true;
+            let selectedDate = moment(this.currentDate);
+            let selectedDateObject = {
+                start: {
+                    date: this.currentDate,
+                    year: selectedDate.year(),
+                    month: selectedDate.month() + 1
+                }
+            }
+            this.getData(selectedDateObject)
+        },
         getData({ start }) {
             this.title = moment(start.date).format("MMMM Y");
             if (this.loadData) {
@@ -202,7 +228,8 @@ export default {
                 this.$inertia.get(
                     route("calendar.index", {
                         year: start.year,
-                        month: start.month
+                        month: start.month,
+                        account: this.bankAccountId
                     }),
                     {},
                     { preserveState: true }
