@@ -21,13 +21,13 @@
                             link
                         >
                             <v-list-item-title
-                                @click="$inertia.visit(subMenu.inertia)"
+                                @click="goto(subMenu.inertia)"
                                 >{{ subMenu.title }}</v-list-item-title
                             >
                         </v-list-item>
                     </v-list-group>
                     <v-list-item v-else link>
-                        <v-list-item-title @click="$inertia.visit(menu.inertia)"
+                        <v-list-item-title @click="goto(menu.inertia)"
                             >{{ menu.title }}
                         </v-list-item-title>
                     </v-list-item>
@@ -159,6 +159,10 @@ export default {
     methods: {
         logout() {
             this.$inertia.post("/logout");
+        },
+        goto(url) {
+            this.drawer = false;
+            this.$inertia.visit(url);
         }
     }
 };
