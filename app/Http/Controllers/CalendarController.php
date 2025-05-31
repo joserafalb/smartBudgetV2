@@ -30,7 +30,7 @@ class CalendarController extends Controller
 
         // Get Bank to display
         $bankAccount = isset($request->account) ? BankAccount::findOrFail($request->account) : BankAccount::where('active', 1)->first();
-        //dd($bankAccount);
+
         if ($bankAccount) {
             $bankAccountId = $bankAccount->id;
         } else {
@@ -143,6 +143,7 @@ class CalendarController extends Controller
                         ->orWhere('limit_type', 'None');
                 }
             )
+            ->where('active', 1)
             ->get();
 
         foreach ($recurringTrasnactions as $recurringTrasnaction) {
